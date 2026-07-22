@@ -1,0 +1,6 @@
+{
+  "name": "Kas Kelas XI DKV",
+  "description": "Aplikasi Manajemen Kas Kelas XI DKV dengan fitur pencatatan iuran mingguan, laporan keuangan, arrears (tunggakan), WhatsApp reminder, dan hak akses Bendahara/Guest.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
