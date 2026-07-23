@@ -11,6 +11,7 @@ import {
   Users,
   Settings,
   Sparkles,
+  Share2,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -20,6 +21,7 @@ interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   totalBalance: number;
+  onOpenShareModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   onLogoutAdmin,
   activeTab,
   setActiveTab,
+  onOpenShareModal,
 }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -64,8 +67,18 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Access Control Badge & Login/Logout */}
-          <div className="flex items-center space-x-3">
+          {/* Access Control Badge & Login/Logout & Share */}
+          <div className="flex items-center space-x-2">
+            {onOpenShareModal && (
+              <button
+                onClick={onOpenShareModal}
+                className="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Bagikan Kas</span>
+              </button>
+            )}
+
             {isAdmin ? (
               <div className="flex items-center space-x-2">
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">

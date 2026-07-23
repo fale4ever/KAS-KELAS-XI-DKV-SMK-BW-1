@@ -12,6 +12,9 @@ import { ArrearsView } from './components/ArrearsView';
 import { StudentDirectoryView } from './components/StudentDirectoryView';
 import { StudentDetailModal } from './components/StudentDetailModal';
 import { SettingsView } from './components/SettingsView';
+import { ShareSummaryModal } from './components/ShareSummaryModal';
+import { ShareMatrixModal } from './components/ShareMatrixModal';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { calculateClassTotals } from './utils/formatters';
 
 const STORAGE_KEY = 'kas_kelas_xi_dkv_v1';
@@ -48,8 +51,10 @@ export default function App() {
     week: WeekPeriod;
   } | null>(null);
 
-  // Add Expense Modal
+  // Modals
   const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState<boolean>(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [isShareMatrixModalOpen, setIsShareMatrixModalOpen] = useState<boolean>(false);
 
   // Student Detail Modal
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
@@ -166,7 +171,7 @@ export default function App() {
   const totals = calculateClassTotals(state);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white pb-16 md:pb-0">
       {/* Header Bar */}
       <Header
         isAdmin={isAdmin}
@@ -175,6 +180,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         totalBalance={totals.currentBalance}
+        onOpenShareModal={() => setIsShareModalOpen(true)}
       />
 
       {/* Main Container */}
@@ -187,6 +193,7 @@ export default function App() {
             onNavigateTab={setActiveTab}
             onOpenAddExpenseModal={() => setIsAddExpenseModalOpen(true)}
             onSetActiveWeek={handleSetActiveWeek}
+            onOpenShareModal={() => setIsShareModalOpen(true)}
           />
         )}
 
@@ -197,6 +204,8 @@ export default function App() {
             onOpenPaymentModal={(student, week) => setPaymentModalData({ student, week })}
             onOpenLoginModal={() => setIsLoginModalOpen(true)}
             onBulkSetLunas={handleBulkSetLunas}
+            onOpenShareMatrixModal={() => setIsShareMatrixModalOpen(true)}
+            onOpenShareModal={() => setIsShareModalOpen(true)}
           />
         )}
 
@@ -289,6 +298,21 @@ export default function App() {
         student={selectedStudentForDetail}
         state={state}
       />
+
+      <ShareSummaryModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        state={state}
+      />
+
+      <ShareMatrixModal
+        isOpen={isShareMatrixModalOpen}
+        onClose={() => setIsShareMatrixModalOpen(false)}
+        state={state}
+      />
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }

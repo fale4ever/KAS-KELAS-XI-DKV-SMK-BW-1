@@ -55,9 +55,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             <Lock className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-bold">Otentikasi Bendahara</h2>
-          <p className="text-xs text-indigo-200 mt-1">
-            Akses khusus Bendahara & Admin untuk mengedit data kas kelas XI DKV.
-          </p>
         </div>
 
         {/* Body */}
@@ -78,7 +75,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Password / PIN Bendahara
+              Password Shared Bendahara
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">

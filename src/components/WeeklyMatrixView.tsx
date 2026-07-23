@@ -11,6 +11,8 @@ import {
   CheckCheck,
   Users,
   Calendar,
+  Share2,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { AppState, Student, WeekPeriod } from '../types';
 import { calculateStudentSummary, formatRupiah } from '../utils/formatters';
@@ -21,6 +23,8 @@ interface WeeklyMatrixViewProps {
   onOpenPaymentModal: (student: Student, week: WeekPeriod) => void;
   onOpenLoginModal: () => void;
   onBulkSetLunas?: (weekId: string, studentIds: string[]) => void;
+  onOpenShareMatrixModal?: () => void;
+  onOpenShareModal?: () => void;
 }
 
 export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
@@ -29,6 +33,8 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
   onOpenPaymentModal,
   onOpenLoginModal,
   onBulkSetLunas,
+  onOpenShareMatrixModal,
+  onOpenShareModal,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('ALL');
@@ -114,6 +120,26 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onOpenShareMatrixModal && (
+              <button
+                onClick={onOpenShareMatrixModal}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center space-x-1.5 shadow-sm"
+              >
+                <ImageIcon className="w-4 h-4" />
+                <span>Bagikan Gambar Matriks (WA)</span>
+              </button>
+            )}
+
+            {onOpenShareModal && (
+              <button
+                onClick={onOpenShareModal}
+                className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-all flex items-center space-x-1.5"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Teks Ringkasan</span>
+              </button>
+            )}
+
             {isAdmin && (
               <button
                 onClick={() => {
@@ -142,6 +168,13 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
             )}
           </div>
         </div>
+
+        <p className="text-[11px] text-indigo-600 dark:text-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/40 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-indigo-500 shrink-0" />
+          <span>
+            <strong>Panduan Tampilan Mobile:</strong> Usap (swipe) tabel ke kanan atau kiri untuk melihat seluruh kolom minggu dan nama siswa secara lengkap.
+          </span>
+        </p>
 
         {/* Filters Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -229,8 +262,8 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
             <thead>
               <tr className="bg-slate-900 text-white text-xs uppercase tracking-wider font-bold">
                 {showBulkMode && <th className="p-3.5 text-center w-10">Pilih</th>}
-                <th className="p-3.5 w-12 text-center sticky left-0 z-20 bg-slate-900">No</th>
-                <th className="p-3.5 w-56 sticky left-12 z-20 bg-slate-900 border-r border-slate-800">
+                <th className="p-3.5 w-10 text-center bg-slate-900 border-r border-slate-800">No</th>
+                <th className="p-3.5 w-48 sm:w-56 bg-slate-900 border-r border-slate-700">
                   Nama Siswa
                 </th>
                 <th className="p-3.5 text-right w-28 bg-slate-900 border-r border-slate-800">
@@ -300,11 +333,11 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
                         </td>
                       )}
 
-                      <td className="p-3.5 text-center font-bold text-slate-400 sticky left-0 bg-white dark:bg-slate-900 z-10">
+                      <td className="p-3.5 text-center font-bold text-slate-400 border-r border-slate-100 dark:border-slate-800">
                         {idx + 1}
                       </td>
 
-                      <td className="p-3.5 font-bold text-slate-900 dark:text-white sticky left-12 bg-white dark:bg-slate-900 z-10 border-r border-slate-100 dark:border-slate-800 truncate">
+                      <td className="p-3.5 font-bold text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-800 whitespace-nowrap">
                         {student.name}
                       </td>
 

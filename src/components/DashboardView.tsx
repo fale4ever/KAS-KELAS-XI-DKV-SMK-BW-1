@@ -14,6 +14,7 @@ import {
   Info,
   ChevronRight,
   ShieldAlert,
+  Share2,
 } from 'lucide-react';
 import { AppState } from '../types';
 import { calculateClassTotals, calculateStudentSummary, formatRupiah } from '../utils/formatters';
@@ -26,6 +27,7 @@ interface DashboardViewProps {
   onOpenPaymentModalForStudent?: (studentId: string, weekId: string) => void;
   onOpenAddExpenseModal?: () => void;
   onSetActiveWeek: (weekId: string) => void;
+  onOpenShareModal: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -35,6 +37,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateTab,
   onOpenAddExpenseModal,
   onSetActiveWeek,
+  onOpenShareModal,
 }) => {
   const totals = calculateClassTotals(state);
   const activeWeekObj = state.weeks.find((w) => w.id === state.activeWeekId) || state.weeks[0];
@@ -217,6 +220,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={onOpenShareModal}
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm"
+          >
+            <Share2 className="w-4 h-4" />
+            <span>Bagikan Ringkasan</span>
+          </button>
+
           {isAdmin ? (
             <>
               <button
@@ -319,9 +330,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </p>
               <ul className="list-disc list-inside space-y-0.5 text-slate-500 dark:text-slate-400">
                 <li>Saldo awal ditetapkan secara resmi sebesar <strong>Rp 0</strong>.</li>
-                <li>Catatan pengeluaran awal dalam keadaan bersih (kosong) untuk diisi kemudian oleh Bendahara.</li>
                 <li>Iuran nominal wajib <strong>Rp 5.000</strong> per minggu per siswa.</li>
                 <li>Pembayaran kurang dari Rp 5.000 otomatis berstatus <span className="text-amber-600 dark:text-amber-400 font-semibold">KURANG</span> dan menampilkan sisa kekurangannya.</li>
+                <li>Semua anggota kelas dan orang tua dapat memantau keterhitungan kas secara terbuka (transparan).</li>
               </ul>
             </div>
           </div>
