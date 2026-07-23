@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Share2, Copy, Check, X, MessageSquare, Send } from 'lucide-react';
+import { Share2, Copy, Check, X, MessageSquare, Send, Download } from 'lucide-react';
 import { AppState } from '../types';
-import { calculateClassTotals, formatRupiah } from '../utils/formatters';
+import { calculateClassTotals, calculateStudentSummary, formatRupiah } from '../utils/formatters';
 
 interface ShareSummaryModalProps {
   isOpen: boolean;
@@ -34,8 +34,8 @@ export const ShareSummaryModal: React.FC<ShareSummaryModalProps> = ({
 
 📌 *Target Iuran Kas:* Rp ${state.weeklyTarget.toLocaleString('id-ID')} / minggu per siswa
 
-👥 *Ketentuan Akses:*
-3 Bendahara XI DKV mengelola data menggunakan 1 password bersama. Semua siswa dapat memantau saldo, rincian pengeluaran, dan tunggakan secara transparan.
+👥 *Sistem Kas Transparan XI DKV:*
+Semua siswa dan wali kelas dapat memantau saldo, rincian pengeluaran, dan status pembayaran secara live dan transparan.
 
 _Diperbarui secara otomatis pada: ${new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
@@ -70,6 +70,28 @@ _Diperbarui secara otomatis pada: ${new Date().toLocaleDateString('id-ID', {
     }
   };
 
+  const handleDownloadCSV = () => {
+    try {
+      let csv = 'No,Nama Siswa,Nomor Absen,Total Bayar (Rp),Tunggakan (Rp)\n';
+      state.students.forEach((s, idx) => {
+        const sum = calculateStudentSummary(s, state.weeks, state.payments, state.weeklyTarget, state.activeWeekId);
+        csv += `${idx + 1},"${s.name.replace(/"/g, '""')}",${s.attendanceNumber},${sum.totalPaid},${sum.totalArrears}\n`;
+      });
+
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Laporan_Kas_XI_DKV_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Failed to export CSV', e);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/70 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
@@ -80,8 +102,8 @@ _Diperbarui secara otomatis pada: ${new Date().toLocaleDateString('id-ID', {
               <Share2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-base font-bold">Bagikan Ringkasan Kas</h2>
-              <p className="text-xs text-indigo-200">Format pesan rapi untuk grup WhatsApp XI DKV</p>
+              <h2 className="text-base font-bold">Laporan Kas XI DKV</h2>
+              <p className="text-xs text-indigo-200">Bagikan ringkasan atau unduh data CSV untuk Excel</p>
             </div>
           </div>
           <button
@@ -98,19 +120,27 @@ _Diperbarui secara otomatis pada: ${new Date().toLocaleDateString('id-ID', {
             {summaryText}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
             <button
               onClick={handleShareWhatsApp}
-              className="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
+              className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
             >
               <MessageSquare className="w-4 h-4" />
               <span>Bagikan ke WhatsApp</span>
             </button>
 
+            <button
+              onClick={handleDownloadCSV}
+              className="py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
+            >
+              <Download className="w-4 h-4" />
+              <span>Unduh CSV (Excel)</span>
+            </button>
+
             {typeof navigator !== 'undefined' && 'share' in navigator && (
               <button
                 onClick={handleNativeShare}
-                className="py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
+                className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center justify-center space-x-2 shadow-sm transition-all"
               >
                 <Send className="w-4 h-4" />
                 <span>Bagikan Sistem</span>

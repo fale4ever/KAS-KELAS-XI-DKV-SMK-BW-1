@@ -120,23 +120,13 @@ export const WeeklyMatrixView: React.FC<WeeklyMatrixViewProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {onOpenShareMatrixModal && (
-              <button
-                onClick={onOpenShareMatrixModal}
-                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center space-x-1.5 shadow-sm"
-              >
-                <ImageIcon className="w-4 h-4" />
-                <span>Bagikan Gambar Matriks (WA)</span>
-              </button>
-            )}
-
             {onOpenShareModal && (
               <button
                 onClick={onOpenShareModal}
-                className="px-3 py-2 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-all flex items-center space-x-1.5"
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center space-x-1.5 shadow-sm"
               >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Teks Ringkasan</span>
+                <Share2 className="w-4 h-4" />
+                <span>Bagikan Laporan Kas (WA & CSV)</span>
               </button>
             )}
 

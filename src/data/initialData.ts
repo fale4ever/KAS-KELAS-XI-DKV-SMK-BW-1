@@ -72,6 +72,6 @@ export const INITIAL_STATE: AppState = {
   expenses: [], // Blank expense records initially as requested
   weeklyTarget: DEFAULT_WEEKLY_TARGET,
   activeWeekId: generateAcademicWeeks()[0].id,
-  adminPin: 'dkv2026', // Default treasurer password (hidden from view)
+  adminPin: 'dkv20262027', // Default treasurer shared password
   waReminderTemplate: DEFAULT_WA_TEMPLATE,
 };

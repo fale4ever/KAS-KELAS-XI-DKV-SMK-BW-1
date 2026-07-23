@@ -61,8 +61,13 @@ export const Header: React.FC<HeaderProps> = ({
                   SMK DKV
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Tahun Ajaran 2026/2027 • Jul 2026 - Jun 2027
+              <p className="text-xs text-slate-400 flex items-center gap-2">
+                <span>Tahun Ajaran 2026/2027</span>
+                <span className="text-slate-600">•</span>
+                <span className="inline-flex items-center text-[10px] text-emerald-400 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse mr-1"></span>
+                  Live Sync
+                </span>
               </p>
             </div>
           </div>

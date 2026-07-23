@@ -54,7 +54,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 text-white border border-white/20">
             <Lock className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold">Otentikasi Bendahara</h2>
+          <h2 className="text-xl font-bold">Akses Admin / Bendahara</h2>
         </div>
 
         {/* Body */}
@@ -69,13 +69,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           {success && (
             <div className="p-3.5 rounded-xl bg-emerald-50 text-emerald-700 text-xs flex items-center space-x-2 border border-emerald-200">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>Login berhasil! Mode Bendahara Aktif.</span>
+              <span>Login berhasil! Mode Input Data Bendahara Aktif.</span>
             </div>
           )}
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Password Shared Bendahara
+              Password Bendahara
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -88,7 +88,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   setPin(e.target.value);
                   setError('');
                 }}
-                placeholder="Masukkan password rahasia..."
+                placeholder="Masukkan password..."
                 className="w-full pl-9 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm rounded-xl border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                 autoFocus
               />
@@ -100,9 +100,6 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2">
-              Privasi terjamin. Password tidak pernah ditampilkan secara langsung di halaman situs.
-            </p>
           </div>
 
           <div className="pt-2 flex items-center space-x-3">
