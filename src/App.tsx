@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppState, ExpenseRecord, Student, WeekPeriod } from './types';
 import { INITIAL_STATE } from './data/initialData';
+import { subscribeToKasData, saveKasDataToFirebase } from './lib/firebase';
 import { Header } from './components/Header';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { DashboardView } from './components/DashboardView';
@@ -57,69 +58,37 @@ export default function App() {
   // Student Detail Modal
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
 
-  const isInitialServerLoadedRef = React.useRef<boolean>(false);
-  const isReceivingServerUpdateRef = React.useRef<boolean>(false);
+  const isInitialFirebaseLoadedRef = React.useRef<boolean>(false);
+  const isReceivingFirebaseUpdateRef = React.useRef<boolean>(false);
 
-  // Load and sync live state from backend API (/api/kas-data)
+  // Subscribe to real-time updates from Firebase Realtime Database
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchServerState = async () => {
-      try {
-        const res = await fetch('/api/kas-data', { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.data && json.data.students && isMounted) {
-            setState((prev) => {
-              // Only update if server state differs significantly
-              if (JSON.stringify(prev) !== JSON.stringify(json.data)) {
-                isReceivingServerUpdateRef.current = true;
-                return {
-                  ...INITIAL_STATE,
-                  ...json.data,
-                };
-              }
-              return prev;
-            });
-          }
-        }
-      } catch (err) {
-        console.warn('Network offline or backend endpoint unavailable, falling back to local state.', err);
-      } finally {
-        if (isMounted) {
-          isInitialServerLoadedRef.current = true;
-        }
-      }
-    };
-
-    fetchServerState();
-
-    // Poll server every 3 seconds so guests see treasurer updates live without reloading
-    const interval = setInterval(fetchServerState, 3000);
-    window.addEventListener('focus', fetchServerState);
+    const unsubscribe = subscribeToKasData((firebaseData) => {
+      isReceivingFirebaseUpdateRef.current = true;
+      setState(firebaseData);
+      isInitialFirebaseLoadedRef.current = true;
+    });
 
     return () => {
-      isMounted = false;
-      clearInterval(interval);
-      window.removeEventListener('focus', fetchServerState);
+      if (unsubscribe) unsubscribe();
     };
   }, []);
 
-  // Persist state to backend API and localStorage on changes
+  // Persist state to Firebase Realtime Database and localStorage on changes
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
-      // Skip posting to server if state change was caused by receiving a server update
-      if (isReceivingServerUpdateRef.current) {
-        isReceivingServerUpdateRef.current = false;
+      if (isReceivingFirebaseUpdateRef.current) {
+        isReceivingFirebaseUpdateRef.current = false;
         return;
       }
 
-      // Skip posting if server state hasn't been fetched yet to avoid overwriting server with stale local data
-      if (!isInitialServerLoadedRef.current) {
+      if (!isInitialFirebaseLoadedRef.current) {
         return;
       }
+
+      saveKasDataToFirebase(state);
 
       fetch('/api/kas-data', {
         method: 'POST',
@@ -235,7 +204,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white pb-16 md:pb-0">
-      {/* Header Bar */}
       <Header
         isAdmin={isAdmin}
         onOpenLoginModal={() => setIsLoginModalOpen(true)}
@@ -246,7 +214,6 @@ export default function App() {
         onOpenShareModal={() => setIsShareModalOpen(true)}
       />
 
-      {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {activeTab === 'dashboard' && (
           <DashboardView
@@ -314,7 +281,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
           <p className="font-bold text-slate-700 dark:text-slate-300">
@@ -326,7 +292,6 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Modals */}
       <AdminLoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
@@ -367,7 +332,6 @@ export default function App() {
         state={state}
       />
 
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
