@@ -21,21 +21,63 @@ export const ShareSummaryModal: React.FC<ShareSummaryModalProps> = ({
   const totals = calculateClassTotals(state);
   const activeWeekObj = state.weeks.find((w) => w.id === state.activeWeekId) || state.weeks[0];
 
+  // Calculate unpaid students and their details up to active week
+  const activeIndex = state.weeks.findIndex((w) => w.id === state.activeWeekId);
+  const weeksUpToActive = activeIndex !== -1 ? state.weeks.slice(0, activeIndex + 1) : state.weeks;
+
+  const unpaidStudentsList = state.students
+    .map((s) => {
+      const summary = calculateStudentSummary(s, weeksUpToActive, state.payments, state.weeklyTarget);
+      if (summary.totalArrears <= 0) return null;
+
+      // Find unpaid week labels
+      const unpaidWeeks: string[] = [];
+      weeksUpToActive.forEach((w) => {
+        const key = `${s.id}_${w.id}`;
+        const paid = state.payments[key] || 0;
+        if (paid < state.weeklyTarget) {
+          const diff = state.weeklyTarget - paid;
+          if (paid > 0) {
+            unpaidWeeks.push(`${w.shortLabel} (kurang ${formatRupiah(diff)})`);
+          } else {
+            unpaidWeeks.push(w.shortLabel);
+          }
+        }
+      });
+
+      return {
+        name: s.name,
+        totalArrears: summary.totalArrears,
+        unpaidWeeksStr: unpaidWeeks.length > 0 ? unpaidWeeks.join(', ') : 'Belum Bayar',
+      };
+    })
+    .filter((item): item is { name: string; totalArrears: number; unpaidWeeksStr: string } => item !== null)
+    .sort((a, b) => b.totalArrears - a.totalArrears);
+
+  let unpaidSection = '';
+  if (unpaidStudentsList.length === 0) {
+    unpaidSection = '🎉 *Semua siswa LUNAS iuran kas!* (Tidak ada tunggakan)';
+  } else {
+    unpaidSection = `⚠️ *DAFTAR SISWA BELUM LUNAS (${unpaidStudentsList.length} Siswa):*\n` +
+      unpaidStudentsList
+        .map(
+          (item, i) =>
+            `${i + 1}. *${item.name}*\n   • Minggu Belum Lunas: ${item.unpaidWeeksStr}\n   • Total Tunggakan: *${formatRupiah(item.totalArrears)}*`
+        )
+        .join('\n\n');
+  }
+
   // Generate clean WhatsApp & plain text formatted summary
   const summaryText = `📊 *LAPORAN RINGKASAN KAS XI DKV*
-🗓️ Periode: ${activeWeekObj.label}
+🗓️ Periode Acuan: ${activeWeekObj.label}
 
-💰 *Ringkasan Keuangan:*
-• Saldo Kas Saat Ini: *${formatRupiah(totals.currentBalance)}*
-• Total Kas Masuk: ${formatRupiah(totals.totalIncome)}
-• Total Pengeluaran: ${formatRupiah(totals.totalExpenses)}
-• Total Tunggakan s/d ${activeWeekObj.shortLabel}: ${formatRupiah(totals.totalArrearsUpToActive)}
-• Tingkat Keterbayaran: ${totals.collectionRate}%
+💰 *RINGKASAN KEUANGAN KAS KELAS:*
+• Total Pemasukan Kas: *${formatRupiah(totals.totalIncome)}*
+• Total Pengeluaran Kas: *${formatRupiah(totals.totalExpenses)}*
+• Target Iuran Mingguan: *${formatRupiah(state.weeklyTarget)} / minggu per siswa*
+• Saldo Sisa Kas Saat Ini: *${formatRupiah(totals.currentBalance)}*
 
-📌 *Target Iuran Kas:* Rp ${state.weeklyTarget.toLocaleString('id-ID')} / minggu per siswa
-
-👥 *Sistem Kas Transparan XI DKV:*
-Semua siswa dan wali kelas dapat memantau saldo, rincian pengeluaran, dan status pembayaran secara live dan transparan.
+${unpaidSection}
 
 _Diperbarui secara otomatis pada: ${new Date().toLocaleDateString('id-ID', {
     weekday: 'long',

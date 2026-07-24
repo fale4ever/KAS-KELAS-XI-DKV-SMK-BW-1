@@ -12,6 +12,7 @@ const DATA_FILE = path.join(process.cwd(), 'kas_data.json');
 
 // GET /api/kas-data - Fetch current live state
 app.get('/api/kas-data', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   try {
     if (fs.existsSync(DATA_FILE)) {
       const content = fs.readFileSync(DATA_FILE, 'utf-8');

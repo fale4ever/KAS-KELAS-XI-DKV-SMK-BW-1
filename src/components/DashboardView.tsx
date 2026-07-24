@@ -72,29 +72,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-200">
       {/* Top Banner & Active Week Switcher */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-4 sm:p-6 text-white shadow-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
           <div>
-            <div className="flex items-center space-x-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <div className="flex items-center space-x-2 mb-1.5 flex-wrap gap-y-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 TAHUN AJARAN 2026/2027
               </span>
               <span className="text-xs text-slate-400">
                 21 Siswa XI DKV
               </span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-white">
+            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
               Ringkasan Kas Kelas XI DKV
             </h2>
-            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+            <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
               Iuran kas mingguan berjalan dari <strong className="text-indigo-200">Minggu 3 Juli 2026</strong> sampai <strong className="text-indigo-200">Minggu 4 Juni 2027</strong> dengan nominal target <strong className="text-emerald-300">Rp {state.weeklyTarget.toLocaleString('id-ID')}/minggu</strong>.
             </p>
           </div>
 
           {/* Active Week Selector */}
-          <div className="bg-slate-800/80 backdrop-blur-md p-3.5 rounded-xl border border-slate-700/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="bg-slate-800/80 backdrop-blur-md p-3 sm:p-3.5 rounded-xl border border-slate-700/80 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
             <div className="flex items-center space-x-2 text-indigo-300">
               <Calendar className="w-4 h-4 shrink-0 text-indigo-400" />
               <span className="text-xs font-semibold whitespace-nowrap">Minggu Acuan:</span>
@@ -102,7 +102,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <select
               value={state.activeWeekId}
               onChange={(e) => onSetActiveWeek(e.target.value)}
-              className="bg-slate-900 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              className="bg-slate-900 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer w-full sm:w-auto"
             >
               {state.weeks.map((w) => (
                 <option key={w.id} value={w.id}>
@@ -332,7 +332,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <li>Saldo awal ditetapkan secara resmi sebesar <strong>Rp 0</strong>.</li>
                 <li>Iuran nominal wajib <strong>Rp 5.000</strong> per minggu per siswa.</li>
                 <li>Pembayaran kurang dari Rp 5.000 otomatis berstatus <span className="text-amber-600 dark:text-amber-400 font-semibold">KURANG</span> dan menampilkan sisa kekurangannya.</li>
-                <li>Semua anggota kelas dan orang tua dapat memantau keterhitungan kas secara terbuka (transparan).</li>
               </ul>
             </div>
           </div>

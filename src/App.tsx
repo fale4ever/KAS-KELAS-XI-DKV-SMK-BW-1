@@ -57,19 +57,23 @@ export default function App() {
   // Student Detail Modal
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
 
+  const isInitialServerLoadedRef = React.useRef<boolean>(false);
+  const isReceivingServerUpdateRef = React.useRef<boolean>(false);
+
   // Load and sync live state from backend API (/api/kas-data)
   useEffect(() => {
     let isMounted = true;
 
     const fetchServerState = async () => {
       try {
-        const res = await fetch('/api/kas-data');
+        const res = await fetch('/api/kas-data', { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data && json.data.students && isMounted) {
             setState((prev) => {
-              // Only update if server state differs significantly or was initialized
+              // Only update if server state differs significantly
               if (JSON.stringify(prev) !== JSON.stringify(json.data)) {
+                isReceivingServerUpdateRef.current = true;
                 return {
                   ...INITIAL_STATE,
                   ...json.data,
@@ -81,13 +85,17 @@ export default function App() {
         }
       } catch (err) {
         console.warn('Network offline or backend endpoint unavailable, falling back to local state.', err);
+      } finally {
+        if (isMounted) {
+          isInitialServerLoadedRef.current = true;
+        }
       }
     };
 
     fetchServerState();
 
-    // Poll server every 4 seconds so guests see treasurer updates live without reloading
-    const interval = setInterval(fetchServerState, 4000);
+    // Poll server every 3 seconds so guests see treasurer updates live without reloading
+    const interval = setInterval(fetchServerState, 3000);
     window.addEventListener('focus', fetchServerState);
 
     return () => {
@@ -101,6 +109,18 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+      // Skip posting to server if state change was caused by receiving a server update
+      if (isReceivingServerUpdateRef.current) {
+        isReceivingServerUpdateRef.current = false;
+        return;
+      }
+
+      // Skip posting if server state hasn't been fetched yet to avoid overwriting server with stale local data
+      if (!isInitialServerLoadedRef.current) {
+        return;
+      }
+
       fetch('/api/kas-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
