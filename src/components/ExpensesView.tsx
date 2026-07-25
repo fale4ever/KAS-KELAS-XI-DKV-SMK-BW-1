@@ -32,6 +32,7 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [expenseToDelete, setExpenseToDelete] = useState<ExpenseRecord | null>(null);
 
   const categories = Array.from(new Set(state.expenses.map((e) => e.category)));
 
@@ -190,16 +191,8 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
                     {isAdmin && (
                       <td className="p-3.5 text-center">
                         <button
-                          onClick={() => {
-                            if (
-                              confirm(
-                                `Apakah Anda yakin ingin menghapus pengeluaran "${expense.description}"?`
-                              )
-                            ) {
-                              onDeleteExpense(expense.id);
-                            }
-                          }}
-                          className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
+                          onClick={() => setExpenseToDelete(expense)}
+                          className="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
                           title="Hapus Pengeluaran"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -213,6 +206,64 @@ export const ExpensesView: React.FC<ExpensesViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {expenseToDelete && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center space-x-3 text-rose-600 dark:text-rose-400">
+              <div className="p-3 bg-rose-100 dark:bg-rose-950/50 rounded-xl shrink-0">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Hapus Pengeluaran?
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Tindakan ini tidak dapat dibatalkan. Saldo kas akan otomatis bertambah kembali.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700/60 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Deskripsi:</span>
+                <span className="font-bold text-slate-900 dark:text-white">{expenseToDelete.description}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Kategori:</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-300">{expenseToDelete.category}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Nominal:</span>
+                <span className="font-extrabold text-rose-600 dark:text-rose-400">{formatRupiah(expenseToDelete.amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Tanggal:</span>
+                <span className="text-slate-700 dark:text-slate-300">{expenseToDelete.date}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end space-x-2 pt-2">
+              <button
+                onClick={() => setExpenseToDelete(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  onDeleteExpense(expenseToDelete.id);
+                  setExpenseToDelete(null);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-all shadow-md shadow-rose-600/20 cursor-pointer"
+              >
+                Ya, Hapus Pengeluaran
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
