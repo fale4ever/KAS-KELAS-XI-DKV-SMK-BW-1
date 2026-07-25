@@ -146,8 +146,6 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({
               </span>
               <input
                 type="number"
-                min="100"
-                step="500"
                 placeholder="0"
                 value={amount}
                 onChange={(e) => {
