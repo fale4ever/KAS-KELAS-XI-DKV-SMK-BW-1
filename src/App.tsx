@@ -79,17 +79,21 @@ export default function App() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
+      // Skip posting if state change was triggered by receiving a Firebase update
       if (isReceivingFirebaseUpdateRef.current) {
         isReceivingFirebaseUpdateRef.current = false;
         return;
       }
 
+      // Skip posting if initial Firebase load hasn't completed
       if (!isInitialFirebaseLoadedRef.current) {
         return;
       }
 
+      // Save to Firebase Realtime Database in real-time
       saveKasDataToFirebase(state);
 
+      // Backup post to server API endpoint
       fetch('/api/kas-data', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,17 +157,25 @@ export default function App() {
       ...expenseData,
       id: 'exp-' + Date.now(),
     };
-    setState((prev) => ({
-      ...prev,
-      expenses: [newRecord, ...prev.expenses],
-    }));
+    setState((prev) => {
+      const newState = {
+        ...prev,
+        expenses: [newRecord, ...prev.expenses],
+      };
+      saveKasDataToFirebase(newState);
+      return newState;
+    });
   };
 
   const handleDeleteExpense = (expenseId: string) => {
-    setState((prev) => ({
-      ...prev,
-      expenses: prev.expenses.filter((e) => e.id !== expenseId),
-    }));
+    setState((prev) => {
+      const newState = {
+        ...prev,
+        expenses: prev.expenses.filter((e) => e.id !== expenseId),
+      };
+      saveKasDataToFirebase(newState);
+      return newState;
+    });
   };
 
   // Student phone contact update
@@ -204,6 +216,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white pb-16 md:pb-0">
+      {/* Header Bar */}
       <Header
         isAdmin={isAdmin}
         onOpenLoginModal={() => setIsLoginModalOpen(true)}
@@ -214,6 +227,7 @@ export default function App() {
         onOpenShareModal={() => setIsShareModalOpen(true)}
       />
 
+      {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         {activeTab === 'dashboard' && (
           <DashboardView
@@ -281,6 +295,7 @@ export default function App() {
         )}
       </main>
 
+      {/* Footer */}
       <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
           <p className="font-bold text-slate-700 dark:text-slate-300">
@@ -292,6 +307,7 @@ export default function App() {
         </div>
       </footer>
 
+      {/* Modals */}
       <AdminLoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
@@ -332,6 +348,7 @@ export default function App() {
         state={state}
       />
 
+      {/* Mobile Bottom Navigation */}
       <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
